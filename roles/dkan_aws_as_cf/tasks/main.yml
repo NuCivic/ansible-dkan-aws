@@ -1,0 +1,28 @@
+---
+#tasks file for asg
+
+- name: Create AutoScale Group and LaunchConfig via cloudformation
+  cloudformation: >
+    stack_name={{ app_name }}
+    state=present
+    region={{ region }}
+    disable_rollback=true
+    template=roles/asgcfn/files/dkan-cf-Multi_AZ-0.1.0.json
+  args:
+    template_parameters:
+      InstanceType: "{{ instance_type }}"
+      SSHLocation: "{{ ssh_location }}"
+      AvailabilityZones: "{{ availability_zones | join(',') }}"
+      Subnets: "{{ asg_subnets | join(',') }}"
+      ImageId: "{{ image_id }}"
+      KeyName: "{{ key_name }}"
+      SecurityGroups: "{{ lc_security_groups | join(',')}}"
+      LoadBalancerNames: "{{ load_balancers | join(',') }}"
+      DBClass: "{{ db_class }}"
+      DBName:  "{{ db_name }}"
+      DBUser: "{{ db_user}}"
+      DBPassword: "{{ db_password}}"
+    tags:
+      Stack: "{{ tag_stack }}"
+
+  register: stack
