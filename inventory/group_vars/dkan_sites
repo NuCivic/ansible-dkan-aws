@@ -1,5 +1,3 @@
----
-client_slug: "client-1"
 instance_type: m3.medium
 availability_zones:
 - us-west-1b
@@ -10,5 +8,3 @@ ssh_location: 0.0.0.0/0
 db_class: "db.m2.xlarge"
 db_name:  "dkandb"
 db_user: "dkandbuser"
-tag_stack: "dkan-ansible-cloudformation"
-webserver_capacity: 1 

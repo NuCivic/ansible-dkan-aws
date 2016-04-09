@@ -3,7 +3,7 @@
 
 - name: Create AutoScale Group and LaunchConfig via cloudformation
   cloudformation: >
-    stack_name={{ app_name }}
+    stack_name={{ client_slug }}
     state=present
     region={{ region }}
     disable_rollback=true
@@ -12,16 +12,17 @@
     template_parameters:
       InstanceType: "{{ instance_type }}"
       SSHLocation: "{{ ssh_location }}"
-      AvailabilityZones: "{{ availability_zones | join(',') }}"
-      Subnets: "{{ asg_subnets | join(',') }}"
-      ImageId: "{{ image_id }}"
+      #AvailabilityZones: "{{ availability_zones | join(',') }}"
+      #Subnets: "{{ asg_subnets | join(',') }}"
+      #ImageId: "{{ image_id }}"
       KeyName: "{{ key_name }}"
-      SecurityGroups: "{{ lc_security_groups | join(',')}}"
-      LoadBalancerNames: "{{ load_balancers | join(',') }}"
+      #SecurityGroups: "{{ lc_security_groups | join(',')}}"
+      #LoadBalancerNames: "{{ load_balancers | join(',') }}"
       DBClass: "{{ db_class }}"
       DBName:  "{{ db_name }}"
       DBUser: "{{ db_user}}"
       DBPassword: "{{ db_password}}"
+      WebServerCapacity: "{{ webserver_capacity }}"
     tags:
       Stack: "{{ tag_stack }}"
 

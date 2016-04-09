@@ -1,0 +1,4 @@
+- hosts: [dkan_sites] 
+  roles:
+    - dkan_aws_as_cf
+    - dkan_aws_network 
