@@ -1,5 +1,5 @@
-- hosts: dkan_sites 
+- hosts: network 
   vars_files:
   - vars/settings.yml
   roles:
-   - dkan_aws_as_cf
+   - dkan_network

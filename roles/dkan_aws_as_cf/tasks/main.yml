@@ -7,7 +7,7 @@
     state=present
     region={{ region }}
     disable_rollback=true
-    template=roles/asgcfn/files/dkan-cf-Multi_AZ-0.1.0.json
+    template=roles/dkan_aws_as_cf/files/dkan-cf-Multi_AZ-0.1.0.json
   args:
     template_parameters:
       InstanceType: "{{ instance_type }}"
