@@ -8,6 +8,10 @@ This currently includes two roles:
 * ``dkan_aws_as_cf`` - CloudFormation template for setting up new instances of a HA DKAN site
 * ``dkan_aws_network`` - Creates VPC for instances created by ``dkan_aws_as_cf``
 
+Requirements
+------------
+
+Requires: https://github.com/boto/boto
 
 Example Playbook
 ----------------
