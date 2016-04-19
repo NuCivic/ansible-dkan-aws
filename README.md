@@ -32,6 +32,22 @@ ansible-playbook instances.yml
 
 To change the number of default webservers for "Cloud City", add ``webserver_capicity: 3`` to ``inventory/host_vars/bespin-cloud-city`` and rerun the ``instances.yml`` playbook.  
 
+## Packer
+### Requirements
+```
+brew cask update
+brew cask install packer
+```
+
+### Intallation
+```
+git clone nucivic/ansible-dkan-aws
+cd ansible-dkan-aws
+ansible-galaxy install -r requirements.txt -p ./roles --force
+packer build dkan-aws.json
+
+```
+
 TODO:
 ----------------
 
