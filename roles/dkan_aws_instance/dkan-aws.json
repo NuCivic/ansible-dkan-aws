@@ -18,7 +18,7 @@
             ]},
         {
           "type": "ansible-local",
-          "playbook_dir": "./",
+          "playbook_dir": ".",
           "playbook_file": "./playbook.yml"
         },
         {
