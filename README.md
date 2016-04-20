@@ -42,7 +42,7 @@ brew cask install packer
 ### Intallation
 ```
 git clone nucivic/ansible-dkan-aws
-cd ansible-dkan-aws/roles/dkan_aws_instance
+cd ansible-dkan-aws/roles/dkan_aws_ami
 ansible-galaxy install -p roles -r requirements.yml --force
 packer build dkan-aws.json
 
