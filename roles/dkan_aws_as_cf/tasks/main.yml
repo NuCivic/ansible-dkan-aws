@@ -14,7 +14,7 @@
       SSHLocation: "{{ ssh_location }}"
       #AvailabilityZones: "{{ availability_zones | join(',') }}"
       #Subnets: "{{ asg_subnets | join(',') }}"
-      #ImageId: "{{ image_id }}"
+      ImageId: "{{ image_id }}"
       KeyName: "{{ key_name }}"
       #SecurityGroups: "{{ lc_security_groups | join(',')}}"
       #LoadBalancerNames: "{{ load_balancers | join(',') }}"

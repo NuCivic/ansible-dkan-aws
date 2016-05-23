@@ -11,4 +11,5 @@ db_class: "db.m2.xlarge"
 db_name:  "dkandb"
 db_user: "dkandbuser"
 tag_stack: "dkan-ansible-cloudformation"
-webserver_capacity: 1 
+webserver_capacity: 1
+image_id: ami-65324905
