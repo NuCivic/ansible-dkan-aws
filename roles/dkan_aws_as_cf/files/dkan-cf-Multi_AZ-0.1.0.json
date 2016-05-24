@@ -24,6 +24,18 @@
       "Default" : "ami-65324905",
       "ConstraintDescription" : "must be a valid AMI instance type."
     },
+    "GIT_URL" : {
+      "Description" : "Git url",
+      "Type" : "String",
+      "Default" : "https://github.com/NuCivic/data-mos-eisley.git",
+      "ConstraintDescription" : "must be a valid AMI instance type."
+    },
+    "GIT_COMMIT" : {
+      "Description" : "Git branch, tag or commit",
+      "Type" : "String",
+      "Default" : "2016-05-25",
+      "ConstraintDescription" : "must be a valid AMI instance type."
+    },
     "SSHLocation": {
       "Description": "The IP address range that can be used to SSH to the EC2 instances",
       "Type": "String",
@@ -341,24 +353,10 @@
             }
           },
           "install_dkan" : {
-            "sources" : {
-              "/var/www/html" : "http://dkan-acquia.nuamsdev.com/dkan-acquia.tar.gz",
-              "/home/ec2-user" : "http://ftp.drupal.org/files/projects/drush-7.x-5.0.tar.gz"
-            },
-            "files" : {
-              "/tmp/update-memory-limit" : {
-                "content" : { "Fn::Join" : [ "", [
-                  "#!/bin/bash\n",
-                  "echo 'memory_limit=-1' >> /etc/php.d/memory.ini \n"
-                ]]},
-                "mode" : "000500",
-                "owner" : "root",
-                "group" : "root"
-              },
               "/tmp/create-dkan-config" : {
                 "content" : { "Fn::Join" : [ "", [
                   "#!/bin/bash\n",
-                  "/home/ec2-user/drush/drush si dkan --db-url=mysql://",{ "Ref" : "DBUser" },":",{ "Ref" : "DBPassword" },"@",{ "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ] },"/",{ "Ref" : "DBName" }, " -y \n"
+                  " /usr/local/bin/dkan-site-setup.sh " {"Ref" : "GIT_URL" } {"Ref" : "GIT_COMMIT" } { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ]} "" { "Ref" : "DBName" } {"Ref" : "DBUser" }{ "Ref" : "DBPassword" } "\n"
                 ]]},
                 "mode" : "000500",
                 "owner" : "root",

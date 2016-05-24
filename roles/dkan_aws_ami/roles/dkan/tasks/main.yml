@@ -1,0 +1,11 @@
+---
+# Variable setup.
+
+- name: Add setup script.
+  copy:
+    src: dkan-site-setup.sh
+    dest: /usr/local/bin/dkan-site-setup.sh
+    owner: root
+    group: root
+    mode: 0644
+    force: no

@@ -21,6 +21,8 @@
       DBClass: "{{ db_class }}"
       DBName:  "{{ db_name }}"
       DBUser: "{{ db_user}}"
+      GIT_URL: "{{ git_url}}"
+      GIT_COMMIT: "{{ git_commit}}"
       DBPassword: "{{ db_password}}"
       WebServerCapacity: "{{ webserver_capacity }}"
     tags:
