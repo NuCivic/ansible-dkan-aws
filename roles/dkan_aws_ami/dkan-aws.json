@@ -5,39 +5,40 @@
       "exclude": [".git/*", "*.swp"]
     },
     "variables": {
-        "aws_access_key": "",
-        "aws_secret_key": ""
+      "aws_access_key": "",
+      "aws_secret_key": ""
     },
     "provisioners": [{
-            "type": "shell",
-            "execute_command": "echo 'ubuntu'|sudo -S bash '{{.Path}}'",
-            "scripts": [
-                "scripts/base.sh",
-                "scripts/dep.sh",
-                "scripts/ansible.sh"
-            ]},
-        {
-          "type": "ansible-local",
-          "playbook_dir": ".",
-          "playbook_file": "./playbook.yml"
-        },
-        {
-            "type": "shell",
-            "execute_command": "echo 'ubuntu'|sudo -S bash '{{.Path}}'",
-            "scripts": [
-                "scripts/cleanup.sh",
-                "scripts/zerodisk.sh"
-            ]
-        }],
+      "type": "shell",
+      "execute_command": "echo 'packer'|sudo -S bash '{{.Path}}'",
+      "scripts": [
+          "scripts/base.sh",
+          "scripts/ansible.sh"
+      ]},
+      {
+        "type": "ansible-local",
+        "playbook_dir": ".",
+        "playbook_file": "./playbook.yml"
+      },
+      {
+      "type": "shell",
+      "execute_command": "echo 'packer'|sudo -S bash '{{.Path}}'",
+      "scripts": [
+          "scripts/cleanup.sh",
+          "scripts/zerodisk.sh"
+      ]
+      }],
     "builders": [{
-          "type": "amazon-ebs",
-          "access_key": "{{user `aws_access_key`}}",
-          "secret_key": "{{user `aws_secret_key`}}",
-          "region": "us-east-1",
-          "source_ami": "ami-de0d9eb7",
-          "instance_type": "m3.medium",
-          "ssh_username": "ubuntu",
-          "ami_name": "nucivic-dkan {{timestamp}}"
-        }],
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "communicator": "ssh",
+      "ssh_pty" : true,
+      "region": "us-west-1",
+      "source_ami": "ami-af4333cf",
+      "instance_type": "m3.large",
+      "ssh_username": "centos",
+      "ami_name": "nucivic-dkan {{timestamp}}"
+    }],
     "post-processors": []
 }

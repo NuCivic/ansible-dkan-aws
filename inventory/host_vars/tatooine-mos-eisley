@@ -10,3 +10,4 @@ ssh_location: 0.0.0.0/0
 db_class: "db.m2.xlarge"
 db_name:  "dkandb"
 db_user: "dkandbuser"
+image_id: ami-e4007b84
