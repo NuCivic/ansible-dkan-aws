@@ -24,17 +24,17 @@
       "Default" : "ami-65324905",
       "ConstraintDescription" : "must be a valid AMI instance type."
     },
-    "GIT_URL" : {
-      "Description" : "Git url",
+    "GitURL" : {
+      "Description" : "Git URL",
       "Type" : "String",
       "Default" : "https://github.com/NuCivic/data-mos-eisley.git",
-      "ConstraintDescription" : "must be a valid AMI instance type."
+      "ConstraintDescription" : "must be a valid git url."
     },
-    "GIT_COMMIT" : {
-      "Description" : "Git branch, tag or commit",
+    "GitCommit" : {
+      "Description" : "Git commit, tag, or branch",
       "Type" : "String",
       "Default" : "2016-05-25",
-      "ConstraintDescription" : "must be a valid AMI instance type."
+      "ConstraintDescription" : "must be a valid git commit, tag or branch."
     },
     "SSHLocation": {
       "Description": "The IP address range that can be used to SSH to the EC2 instances",
@@ -353,24 +353,15 @@
             }
           },
           "install_dkan" : {
+            "files" : {
               "/tmp/create-dkan-config" : {
                 "content" : { "Fn::Join" : [ "", [
                   "#!/bin/bash\n",
-                  " /usr/local/bin/dkan-site-setup.sh " {"Ref" : "GIT_URL" } {"Ref" : "GIT_COMMIT" } { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ]} "" { "Ref" : "DBName" } {"Ref" : "DBUser" }{ "Ref" : "DBPassword" } "\n"
+                  "sh /usr/local/bin/dkan-site-setup.sh ",{ "Ref" : "GitURL" },{ "Ref" : "GitCommit" },{ "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ] },"\" \"",{ "Ref" : "DBName" },{ "Ref" : "DBUser" },{ "Ref" : "DBPassword" }, " \n"
                 ]]},
                 "mode" : "000500",
                 "owner" : "root",
                 "group" : "root"
-              }
-            },
-            "commands" : {
-              "01_update_memory_limit" : {
-                "command" : "/tmp/update-memory-limit",
-                "cwd" : "/root"
-              },
-              "02_configure_dkan" : {
-                "command" : "/tmp/create-dkan-config",
-                "cwd" : "/var/www/html/webroot"
               }
             },
             "services" : {
@@ -389,10 +380,10 @@
         "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
                        "#!/bin/bash -xe\n",
                        "/bin/easy_install --script-dir /opt/aws/bin https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz", "\n",
-                  	   "# Now fix the cfn-hup script and copy to init.d location as AWS does not do it for you", "\n",
-                       "cp -f `pip show aws-cfn-bootstrap 2>/dev/null|grep -E \"^Location\"|awk -F: '{print $2}'`/init/redhat/cfn-hup /etc/init.d/", "\n",
-                       "chmod 755 /etc/init.d/cfn-hup", "\n",
-                       "chkconfig --add cfn-hup", "\n",
+                     	    "# Now fix the cfn-hup script and copy to init.d location as AWS does not do it for you", "\n",
+                       	    "cp -f `pip show aws-cfn-bootstrap 2>/dev/null|grep -E \"^Location\"|awk -F: '{print $2}'`/init/redhat/cfn-hup /etc/init.d/", "\n",
+                       	    "chmod 755 /etc/init.d/cfn-hup", "\n",
+                       	    "chkconfig --add cfn-hup", "\n",
 
                        "/opt/aws/bin/cfn-init -v ",
                        "         --stack ", { "Ref" : "AWS::StackName" },

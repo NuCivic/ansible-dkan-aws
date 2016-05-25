@@ -10,4 +10,6 @@ ssh_location: 0.0.0.0/0
 db_class: "db.m2.xlarge"
 db_name:  "dkandb"
 db_user: "dkandbuser"
-image_id: ami-e4007b84
+image_id: ami-f5750e95
+git_url: https://github.com/NuCivic/data-mos-eisley.git
+git_tag: 2016-05-25
