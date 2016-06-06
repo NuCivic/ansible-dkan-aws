@@ -19,3 +19,20 @@
     vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
   with_items: "{{ vpc.subnets }}"
   register: ec2_vpc_subnet_out
+
+- name: Create the VPC internet gateway
+  ec2_vpc_igw:
+    region: "{{ region }}"
+    state: present
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  register: ec2_vpc_igw_out
+
+- name: Create the igw route table
+  ec2_vpc_route_table:
+    region: "{{ region }}"
+    resource_tags: "{{ item.resource_tags }}"
+    routes: "{{ item.routes }}"
+    subnets: "{{ item.subnets }}"
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.route_tables.igw }}"
+  register: ec2_vpc_route_table_igw_out

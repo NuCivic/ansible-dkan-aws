@@ -37,3 +37,14 @@ vpc:
         Name: "{{ env + '_private_1' }}"
         Environment: "{{ env }}"
         Type: "private"
+  route_tables:
+    igw:
+      - resource_tags:
+          Name: "{{ env + '_public' }}"
+          Environment: "{{ env }}"
+        subnets:
+          - "10.0.0.0/18"
+          - "10.0.64.0/18"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: igw
