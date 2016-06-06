@@ -3,9 +3,37 @@
 env: dkanex
 
 region: us-west-2
+az:
+  - "us-west-2a"
+  - "us-west-2b"
 
 vpc:
   name: "{{ env }}"
   cidr_block: 10.0.0.0/16
   tags:
     Environment: "{{ env }}"
+  subnets:
+    - cidr: 10.0.0.0/18
+      az: "{{ az[0] }}"
+      resource_tags:
+        Name: "{{ env + '_public_0' }}"
+        Environment: "{{ env }}"
+        Type: "public"
+    - cidr: 10.0.128.0/18
+      az: "{{ az[0] }}"
+      resource_tags:
+        Name: "{{ env + '_private_0' }}"
+        Environment: "{{ env }}"
+        Type: "private"
+    - cidr: 10.0.64.0/18
+      az: "{{ az[1] }}"
+      resource_tags:
+        Name: "{{ env + '_public_1' }}"
+        Environment: "{{ env }}"
+        Type: "public"
+    - cidr: 10.0.196.0/18
+      az: "{{ az[1] }}"
+      resource_tags:
+        Name: "{{ env + '_private_1' }}"
+        Environment: "{{ env }}"
+        Type: "private"
