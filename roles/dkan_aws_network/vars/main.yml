@@ -53,6 +53,19 @@ vpc:
         routes:
           - dest: 0.0.0.0/0
             gateway_id: igw
+    private:
+      - resource_tags:
+          Name: "{{ env + '_private_0' }}"
+          Environment: "{{ env }}"
+        subnets:
+          - "{{ env + '_private_0' }}"
+        placement: "{{ az[0] }}"
+      - resource_tags:
+          Name: "{{ env + '_private_1' }}"
+          Environment: "{{ env }}"
+        subnets:
+          - "{{ env + '_private_1' }}"
+        placement: "{{ az[1] }}"
   sg_list:
     - name: "{{ env + '_nat' }}"
       description: access NAT, allow outbound nat

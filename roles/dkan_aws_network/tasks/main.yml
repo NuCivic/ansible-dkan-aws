@@ -65,3 +65,16 @@
     assign_public_ip: yes
   with_items: "{{ vpc.nat }}"
   register: ec2_nat_instance
+
+- name: Create the private route tables
+  ec2_vpc_route_table:
+    region: "{{ region }}"
+    resource_tags: "{{ item.resource_tags }}"
+    routes:
+      - dest: 0.0.0.0/0
+        instance_id: "{{ ec2_nat_instance.results | get_nat(item.placement) }}"
+    subnets: "{{ item.subnets }}"
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.route_tables.private }}"
+  register: ec2_vpc_route_table_private_out
+  ignore_errors: yes
