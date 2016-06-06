@@ -36,3 +36,32 @@
     vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
   with_items: "{{ vpc.route_tables.igw }}"
   register: ec2_vpc_route_table_igw_out
+
+- name: Create the NAT security groups
+  ec2_group:
+    description: "{{ item.description }}"
+    name: "{{ item.name }}"
+    region: "{{ region }}"
+    rules: "{{ item.rules }}"
+    rules_egress: "{{ item.rules_egress }}"
+    state: present
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.sg_list }}"
+  register: ec2_group_out
+
+- name: Launch NAT boxes
+  ec2:
+    region: "{{ region }}"
+    key_name: "{{ key_name }}"
+    instance_type: "{{ nat_instance_type }}"
+    image: "{{ nat_ami }}"
+    wait: yes
+    group: "{{ env + '_nat' }}"
+    source_dest_check: no
+    instance_tags:
+      Name: "{{ item.name }}"
+      Environment: "{{ env }}"
+    vpc_subnet_id: "{{ ec2_vpc_subnet_out.results | get_subnets('Name', item.subnet) | first }}"
+    assign_public_ip: yes
+  with_items: "{{ vpc.nat }}"
+  register: ec2_nat_instance
