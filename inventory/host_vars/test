@@ -1,4 +1,4 @@
-client_slug: tatooine-mos-eisley-data
+client_slug: test
 db_password: nosecurity
 instance_type: m3.medium
 availability_zones:
