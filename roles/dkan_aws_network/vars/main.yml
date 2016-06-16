@@ -1,2 +1,88 @@
 ---
-# vars file for myapp_infra
+
+env: dkanex
+
+key_name: "asghaier"
+
+region: us-west-2
+az:
+  - "us-west-2a"
+  - "us-west-2b"
+
+nat_ami: ami-d3f506b3
+nat_instance_type: t2.small
+
+vpc:
+  name: "{{ env }}"
+  cidr_block: 10.0.0.0/16
+  tags:
+    Environment: "{{ env }}"
+  subnets:
+    - cidr: 10.0.0.0/18
+      az: "{{ az[0] }}"
+      resource_tags:
+        Name: "{{ env + '_public_0' }}"
+        Environment: "{{ env }}"
+        Type: "public"
+    - cidr: 10.0.128.0/18
+      az: "{{ az[0] }}"
+      resource_tags:
+        Name: "{{ env + '_private_0' }}"
+        Environment: "{{ env }}"
+        Type: "private"
+    - cidr: 10.0.64.0/18
+      az: "{{ az[1] }}"
+      resource_tags:
+        Name: "{{ env + '_public_1' }}"
+        Environment: "{{ env }}"
+        Type: "public"
+    - cidr: 10.0.196.0/18
+      az: "{{ az[1] }}"
+      resource_tags:
+        Name: "{{ env + '_private_1' }}"
+        Environment: "{{ env }}"
+        Type: "private"
+  route_tables:
+    igw:
+      - resource_tags:
+          Name: "{{ env + '_public' }}"
+          Environment: "{{ env }}"
+        subnets:
+          - "10.0.0.0/18"
+          - "10.0.64.0/18"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: igw
+    private:
+      - resource_tags:
+          Name: "{{ env + '_private_0' }}"
+          Environment: "{{ env }}"
+        subnets:
+          - "{{ env + '_private_0' }}"
+        placement: "{{ az[0] }}"
+      - resource_tags:
+          Name: "{{ env + '_private_1' }}"
+          Environment: "{{ env }}"
+        subnets:
+          - "{{ env + '_private_1' }}"
+        placement: "{{ az[1] }}"
+  sg_list:
+    - name: "{{ env + '_nat' }}"
+      description: access NAT, allow outbound nat
+      rules:
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: icmp
+          from_port: -1
+          to_port: -1
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          cidr_ip: 0.0.0.0/0
+  nat:
+    - name: "{{ env + '_nat0' }}"
+      subnet: "{{ env + '_public_0' }}"
+    - name: "{{ env + '_nat1' }}"
+      subnet: "{{ env + '_public_1' }}"

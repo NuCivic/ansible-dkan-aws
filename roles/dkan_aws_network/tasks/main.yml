@@ -1,52 +1,80 @@
-# tasks file for myapp_infra
-- name: create vpc
-  ec2_vpc:
+---
+
+- name: Create the AWS Virtual Private Cloud
+  ec2_vpc_net:
+    cidr_block: "{{ vpc.cidr_block }}"
+    name: "{{ env }}"
+    region: "{{ region }}"
     state: present
-    cidr_block: 172.22.0.0/16
-    resource_tags: { "Name":" {{ infra_name }}" }
-    subnets: "{{ vpc_subnets }}"
-    internet_gateway: True
-    route_tables: "{{ route_tables }}"
+    tags: "{{ vpc.tags }}"
+  register: ec2_vpc_net_out
+
+- name: Create the VPC subnets
+  ec2_vpc_subnet:
+    az: "{{ item.az }}"
+    cidr: "{{ item.cidr }}"
     region: "{{ region }}"
-    wait: yes
-  register: vpc
+    resource_tags: "{{ item.resource_tags }}"
+    state: present
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.subnets }}"
+  register: ec2_vpc_subnet_out
 
-#- name: create admin access
-#  ec2_group:
-#    name: admin_access
-#    description: SSH access for admins
-#    region: "{{ region }}"
-#    vpc_id: "{{ vpc.vpc_id }}"
-#    rules:
-#      - proto: tcp
-#        from_port: 22
-#        to_port: 22
-#        cidr_ip: 0.0.0.0/0
-#  tags: security_groups
-#  register: admin_access_group
+- name: Create the VPC internet gateway
+  ec2_vpc_igw:
+    region: "{{ region }}"
+    state: present
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  register: ec2_vpc_igw_out
 
-- name: create app security group
+- name: Create the igw route table
+  ec2_vpc_route_table:
+    region: "{{ region }}"
+    resource_tags: "{{ item.resource_tags }}"
+    routes: "{{ item.routes }}"
+    subnets: "{{ item.subnets }}"
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.route_tables.igw }}"
+  register: ec2_vpc_route_table_igw_out
+
+- name: Create the NAT security groups
   ec2_group:
-    name: "{{ infra_name }}"
-    description: "{{ infra_name }} security group"
+    description: "{{ item.description }}"
+    name: "{{ item.name }}"
     region: "{{ region }}"
-    rules:
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 0
-        to_port: 65535
-        group_name: "{{ infra_name }}"
-      - proto: udp
-        from_port: 0
-        to_port: 65535
-        group_name: "{{ infra_name }}"
-      - proto: icmp
-        from_port: 0
-        to_port: 0
-        group_name: "{{ infra_name }}"
-    vpc_id: "{{ vpc.vpc_id }}"
-  tags: security_groups
-  register: app_security_group
+    rules: "{{ item.rules }}"
+    rules_egress: "{{ item.rules_egress }}"
+    state: present
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.sg_list }}"
+  register: ec2_group_out
+
+- name: Launch NAT boxes
+  ec2:
+    region: "{{ region }}"
+    key_name: "{{ key_name }}"
+    instance_type: "{{ nat_instance_type }}"
+    image: "{{ nat_ami }}"
+    wait: yes
+    group: "{{ env + '_nat' }}"
+    source_dest_check: no
+    instance_tags:
+      Name: "{{ item.name }}"
+      Environment: "{{ env }}"
+    vpc_subnet_id: "{{ ec2_vpc_subnet_out.results | get_subnets('Name', item.subnet) | first }}"
+    assign_public_ip: yes
+  with_items: "{{ vpc.nat }}"
+  register: ec2_nat_instance
+
+- name: Create the private route tables
+  ec2_vpc_route_table:
+    region: "{{ region }}"
+    resource_tags: "{{ item.resource_tags }}"
+    routes:
+      - dest: 0.0.0.0/0
+        instance_id: "{{ ec2_nat_instance.results | get_nat(item.placement) }}"
+    subnets: "{{ item.subnets }}"
+    vpc_id: "{{ ec2_vpc_net_out.vpc.id }}"
+  with_items: "{{ vpc.route_tables.private }}"
+  register: ec2_vpc_route_table_private_out
+  ignore_errors: yes
